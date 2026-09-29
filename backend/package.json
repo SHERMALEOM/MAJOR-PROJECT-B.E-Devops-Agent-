@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "type":"module",
+    "dotenv": "^18.0.4",
+    "mongoose": "^9.10.2",
+    "winston": "^3.19.0"
+  }
+}
