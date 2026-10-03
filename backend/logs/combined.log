@@ -49,3 +49,7 @@
 {"level":"info","message":"User logged in: shermaleom004@gmail.com","timestamp":"2026-10-02T05:39:14.162Z"}
 {"level":"info","message":"User logged in: shermaleom004@gmail.com","timestamp":"2026-10-02T05:39:24.287Z"}
 {"level":"info","message":"User logged in: shermaleom004@gmail.com","timestamp":"2026-10-02T05:42:01.896Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-10-02T09:56:58.184Z"}
+{"level":"info","message":"MongoDB Connected Successfully!","timestamp":"2026-10-02T09:56:58.416Z"}
+{"level":"info","message":"Server running on port 5000","timestamp":"2026-10-02T10:26:33.465Z"}
+{"level":"info","message":"MongoDB Connected Successfully!","timestamp":"2026-10-02T10:26:33.696Z"}
