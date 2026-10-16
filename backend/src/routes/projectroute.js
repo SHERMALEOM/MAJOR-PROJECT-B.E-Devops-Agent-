@@ -9,18 +9,18 @@ import {
     deleteProject
 } from  "../controllers/projectController.js"
 
-const router = express.Router();
+const projectrouter = express.Router();
 
 // Create a new project
-router.post("/", authMiddleware, createProject);
+projectrouter.post("/", authMiddleware, createProject);
 
 // Get all projects of logged-in user
-router.get("/", authMiddleware, getProjects);
+projectrouter.get("/", authMiddleware, getProjects);
 
 // Get a single project
-router.get("/:id", authMiddleware, getProject);
+projectrouter.get("/:id", authMiddleware, getProject);
 
 // Delete a project
-router.delete("/:id", authMiddleware, deleteProject);
+projectrouter.delete("/:id", authMiddleware, deleteProject);
 
-export default router;
+export default projectrouter;

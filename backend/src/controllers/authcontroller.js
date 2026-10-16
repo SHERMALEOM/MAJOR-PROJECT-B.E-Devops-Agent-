@@ -174,4 +174,4 @@ export const logout = async (req, res) => {
             message: error.message
         });
     }
-};
+};  
