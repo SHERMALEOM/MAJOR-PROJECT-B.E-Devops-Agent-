@@ -1,11 +1,13 @@
-const mongoose= require('mongoose');
-import dotenv from  "dotenv"
-import env from "./env"
-dotenv.config();
+import mongoose from "mongoose";
+import env from "./env.js";
+import logger from "./logger.js";
 
-async function connection() {
-   await  mongoose.connect(env.mongouri)
-}
+const connectDatabase = async () => {
+    if (!env.MONGO_URI) throw new Error("MONGO_URI is required to start the API");
+    await mongoose.connect(env.MONGO_URI, { serverSelectionTimeoutMS: env.MONGO_SERVER_SELECTION_TIMEOUT_MS });
+    logger.info("MongoDB connected successfully");
+    return mongoose.connection;
+};
 
-module.exports=connection;
+export default connectDatabase;
 

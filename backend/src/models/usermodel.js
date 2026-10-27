@@ -18,7 +18,8 @@ const userSchema = new mongoose.Schema(
 
     password: {
       type: String,
-      required: true
+      required: true,
+      select: false
     },
 
     githubUsername: {
@@ -30,6 +31,11 @@ const userSchema = new mongoose.Schema(
     githubConnected: {
       type: Boolean,
       default: false
+    },
+
+    tokenVersion: {
+      type: Number,
+      default: 0
     }
   },
   {

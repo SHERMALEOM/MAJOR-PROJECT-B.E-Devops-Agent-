@@ -22,6 +22,8 @@ const deploymentSchema = new mongoose.Schema(
       type: String,
       enum: [
         "pending",
+        "cloning",
+        "analyzing",
         "building",
         "deploying",
         "verifying",
@@ -51,6 +53,7 @@ const deploymentSchema = new mongoose.Schema(
       type: String,
       default: null
     },
+    publicCheck: { type: mongoose.Schema.Types.Mixed, default: null },
 
     retryCount: {
       type: Number,
@@ -61,6 +64,14 @@ const deploymentSchema = new mongoose.Schema(
       type: String,
       default: null
     },
+    stage: { type: String, default: "queued" },
+    detectedLanguages: { type: [String], default: [] },
+    detectedFrameworks: { type: [String], default: [] },
+    buildStrategy: { type: String, default: null },
+    localUrl: { type: String, default: null },
+    hostPort: { type: Number, default: null },
+    healthCheck: { type: mongoose.Schema.Types.Mixed, default: null },
+    previousDeploymentId: { type: mongoose.Schema.Types.ObjectId, ref: "Deployment", default: null },
 
     startedAt: {
       type: Date,

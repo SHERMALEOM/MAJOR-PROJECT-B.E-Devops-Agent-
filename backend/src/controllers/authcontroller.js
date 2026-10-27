@@ -7,15 +7,17 @@ import env from "../config/env.js";
 // Register
 export const registerUser = async (req, res) => {
   try {
-    const {name,email,password}=req.body;
+    const { name, email, password } = req.body || {};
+    const normalizedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
+    const normalizedName = typeof name === "string" ? name.trim() : "";
+    if (!normalizedName || normalizedName.length > 80) return res.status(400).json({ success: false, message: "Name is required and must be at most 80 characters" });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) || normalizedEmail.length > 254) return res.status(400).json({ success: false, message: "Enter a valid email address" });
+    if (typeof password !== "string" || password.length < 8 || Buffer.byteLength(password, "utf8") > 72) return res.status(400).json({ success: false, message: "Password must be at least 8 characters and no more than 72 bytes" });
 
-
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    // const sameUser= await user.findOne({email})
+    const existingUser = await User.findOne({ email: normalizedEmail });
 
     if (existingUser) {
-      return res.status(400).json({
+      return res.status(409).json({
         success: false,
         message: "User already exists"
       });
@@ -26,8 +28,8 @@ export const registerUser = async (req, res) => {
 
     // Create user
     const user = await User.create({
-      name,
-      email,
+      name: normalizedName,
+      email: normalizedEmail,
       password: hashedPassword
     });
 
@@ -44,10 +46,8 @@ export const registerUser = async (req, res) => {
     });
 
   } catch (error) {
-    logger.error("Registration failed", {
-      message: error.message,
-      stack: error.stack
-    });
+    logger.error("Registration failed", { message: error.message });
+    if (error.code === 11000) return res.status(409).json({ success: false, message: "An account with this email already exists" });
 
     res.status(500).json({
       success: false,
@@ -60,10 +60,11 @@ export const registerUser = async (req, res) => {
 // Login
 export const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body || {};
+    const normalizedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) || typeof password !== "string" || !password || Buffer.byteLength(password, "utf8") > 72) return res.status(400).json({ success: false, message: "Enter a valid email address and password" });
 
-    // Find user
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: normalizedEmail }).select("+password");
 
     if (!user) {
       return res.status(401).json({
@@ -87,17 +88,10 @@ export const loginUser = async (req, res) => {
 
     // Create JWT
     const token = jwt.sign(
-      { userId: user._id },
+      { userId: user._id.toString(), tokenVersion: user.tokenVersion || 0 },
        env.JWT_SECRET,
       { expiresIn: "7d" }
     );
-
-    res.cookie("token", token, {
-    httpOnly: true,
-    secure: env.NODE_ENV === "production",
-    sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000
-});
 
     logger.info(`User logged in: ${user.email}`);
 
@@ -113,10 +107,7 @@ export const loginUser = async (req, res) => {
     });
 
   } catch (error) {
-    logger.error("Login failed", {
-      message: error.message,
-      stack: error.stack
-    });
+    logger.error("Login failed", { message: error.message });
 
     res.status(500).json({
       success: false,
@@ -148,7 +139,7 @@ export const getMe = async (req, res) => {
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: error.message
+            message: "Unable to load the current user"
         });
     }
 };
@@ -157,21 +148,17 @@ export const getMe = async (req, res) => {
 // Logout user
 export const logout = async (req, res) => {
     try {
-        res.clearCookie("token", {
-            httpOnly: true,
-            secure: env.NODE_ENV === "production",
-            sameSite: "strict"
-        });
-
+        await User.updateOne({ _id: req.user.userId }, { $inc: { tokenVersion: 1 } });
         res.status(200).json({
             success: true,
             message: "Logged out successfully"
         });
 
     } catch (error) {
+        logger.error("Logout failed", { message: error.message });
         res.status(500).json({
             success: false,
-            message: error.message
+            message: "Logout failed"
         });
     }
-};  
+};

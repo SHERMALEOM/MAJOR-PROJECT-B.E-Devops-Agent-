@@ -1,5 +1,6 @@
 
 import Project from "../models/projectmodel.js";
+import mongoose from "mongoose";
 
 // Api testing is remaining  
 
@@ -55,6 +56,7 @@ export const getProjects = async (req, res) => {
 // GET ONE PROJECT
 export const getProject = async (req, res) => {
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ success: false, message: "Invalid project ID" });
         const project = await Project.findOne({
             _id: req.params.id,
             userId: req.user.userId
@@ -84,6 +86,7 @@ export const getProject = async (req, res) => {
 // DELETE PROJECT
 export const deleteProject = async (req, res) => {
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ success: false, message: "Invalid project ID" });
         const project = await Project.findOneAndDelete({
             _id: req.params.id,
             userId: req.user.userId

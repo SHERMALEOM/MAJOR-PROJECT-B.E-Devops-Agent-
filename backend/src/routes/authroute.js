@@ -13,7 +13,7 @@ const authrouter = express.Router();
 authrouter.post("/register", registerUser);
 authrouter.post("/login", loginUser);
 authrouter.get("/getme",authMiddleware,getMe );
-authrouter.post("/logout",logout );
+authrouter.post("/logout",authMiddleware,logout );
 
 export default authrouter;
 

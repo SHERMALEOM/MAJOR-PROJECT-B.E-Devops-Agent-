@@ -8,10 +8,19 @@ import {
     getProjectDeployments,
     getDeploymentById,
     getDeploymentStatus,
-    rollbackDeployment
+    rollbackDeployment,
+    getDeploymentLogs,
+    getUserDeployments,
+    deployRepositoryForUser,
+    redeployProject
 } from "../controllers/deploymentController.js";
 
 const deploymentrouter = express.Router();
+
+deploymentrouter.post("/from-repository", authMiddleware, deployRepositoryForUser);
+deploymentrouter.get("/", authMiddleware, getUserDeployments);
+deploymentrouter.get("/:id/logs", authMiddleware, getDeploymentLogs);
+deploymentrouter.post("/project/:projectId/redeploy", authMiddleware, redeployProject);
 
 // Create a deployment
 deploymentrouter.post(
